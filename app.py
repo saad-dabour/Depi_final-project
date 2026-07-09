@@ -14,7 +14,7 @@ from PIL import Image
 
 st.set_page_config(
     page_title="AI Skin Analyzer",
-    page_icon="🔬",
+    page_icon="🧴",
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -108,9 +108,18 @@ def predict_skin_condition(pil_img):
 
 from groq import Groq
 
-client = Groq(api_key="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")
+# The API key is read from an environment variable — never hardcode it here.
+# Set it before running:  setx GROQ_API_KEY "your-new-key"   (Windows, new terminal after)
+#                          export GROQ_API_KEY="your-new-key" (Mac/Linux)
+client = Groq(api_key="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")
 
 def ask_llm(condition, confidence, user_question):
+
+    if client is None:
+        return (
+            "⚠️ Chatbot not configured. Set the GROQ_API_KEY environment "
+            "variable and restart the app to enable it."
+        )
 
     prompt = f"""
 You are a professional skincare assistant.
@@ -158,72 +167,92 @@ Guidelines:
 # ── Custom CSS ────────────────────────────────────────────────────────────────
 st.markdown("""
 <style>
-/* ── global ── */
-html, body {
-    color:#1f2937;
+/* ── palette: dermatology / skincare theme ── */
+:root{
+    --ivory:#f6f1ea;
+    --charcoal:#241f1c;
+    --clay:#c96f4a;
+    --clay-dark:#a8562f;
+    --sage:#7c8f6e;
+    --sage-dark:#5f6f52;
+    --line:#e2d8ca;
+    --card:#fffdf9;
+}
+
+/* ── global — force readable text regardless of the browser theme ── */
+html, body, [class*="css"] {
+    color: var(--charcoal) !important;
     font-family:"Poppins","Segoe UI",sans-serif;
 }
-[data-testid="stAppViewContainer"] { background: #faf9fc; }
-[data-testid="stSidebar"] { background: #1e1b2e; }
-[data-testid="stSidebar"] * { color: #e8e2f8 !important; }
+h1, h2, h3, h4, h5, h6, p, li, span, label {
+    color: var(--charcoal);
+}
+[data-testid="stAppViewContainer"] { background: var(--ivory); }
+[data-testid="stSidebar"] { background: var(--charcoal); }
+[data-testid="stSidebar"] * { color: var(--ivory) !important; }
+[data-testid="stSidebar"] table, [data-testid="stSidebar"] td, [data-testid="stSidebar"] th {
+    color: var(--ivory) !important; border-color: #46403a !important;
+}
 
 /* ── hero banner ── */
 .hero {
-    background: linear-gradient(135deg, #7c3aed 0%, #a855f7 50%, #ec4899 100%);
+    background: linear-gradient(135deg, var(--clay) 0%, #d98a63 50%, var(--sage) 100%);
     border-radius: 18px;
     padding: 2.2rem 2rem;
     text-align: center;
     color: white;
     margin-bottom: 1.8rem;
-    box-shadow: 0 8px 32px rgba(124,58,237,.25);
+    box-shadow: 0 8px 32px rgba(169,86,47,.25);
 }
+.hero h1, .hero p { color: white !important; }
 .hero h1 { font-size: 2.4rem; margin: 0 0 .4rem; letter-spacing: -1px; }
-.hero p  { font-size: 1.05rem; opacity: .88; margin: 0; }
+.hero p  { font-size: 1.05rem; opacity: .97; margin: 0; font-weight: 500; }
 
 /* ── upload box ── */
 .upload-hint {
-    border: 2px dashed #a855f7;
+    border: 2px dashed var(--clay);
     border-radius: 14px;
     padding: 1.8rem 1.2rem;
     text-align: center;
-    background: #f5f0ff;
-    color: #6b21a8;
+    background: #fbf2ec;
+    color: var(--clay-dark) !important;
+    font-weight: 600;
     font-size: .95rem;
 }
+.upload-hint span { color: var(--clay-dark) !important; opacity: 1; }
 
 /* ── result card ── */
 .result-card {
-    background:white;
-    color:#222222;
+    background: var(--card);
     border-radius: 16px;
     padding: 1.6rem 1.8rem;
-    border-left: 6px solid #7c3aed;
-    box-shadow: 0 4px 20px rgba(0,0,0,.07);
+    border-left: 6px solid var(--clay);
+    box-shadow: 0 4px 20px rgba(36,31,28,.08);
     margin-bottom: 1rem;
 }
-.result-card h2 { margin: 0 0 .5rem; font-size: 1.7rem; }
-.result-card p  { margin: .25rem 0; color: #444; }
+.result-card h2 { margin: 0 0 .5rem; font-size: 1.7rem; color: var(--charcoal) !important; }
+.result-card p  { margin: .25rem 0; color: #333333 !important; }
 
 /* ── severity badges ── */
-.sev-mild     { color: #16a34a; font-weight: 700; font-size: 1.05rem; }
-.sev-moderate { color: #d97706; font-weight: 700; font-size: 1.05rem; }
-.sev-severe   { color: #dc2626; font-weight: 700; font-size: 1.05rem; }
+.sev-mild     { color: #15803d !important; font-weight: 700; font-size: 1.05rem; }
+.sev-moderate { color: #b45309 !important; font-weight: 700; font-size: 1.05rem; }
+.sev-severe   { color: #b91c1c !important; font-weight: 700; font-size: 1.05rem; }
 
 /* ── recommendation cards ── */
 .rec-card {
-    background:#FFF8E1;
-    color:#222222;
+    background: #f6f1ea;
+    color: var(--charcoal) !important;
     border-radius: 12px;
     padding: 1rem 1.1rem;
     margin-bottom: .7rem;
-    border: 1px solid #fde68a;
+    border: 1px solid var(--line);
     font-size: .93rem;
     line-height: 1.55;
 }
 .rec-card-purple {
-    background:#F3E8FF;
-    color:#222222;
-    border: 1px solid #d8b4fe;
+    background: #eef1e9;
+    color: var(--charcoal) !important;
+    border: 1px solid #cdd8c2;
     border-radius: 12px;
     padding: 1rem 1.1rem;
     margin-bottom: .7rem;
@@ -231,9 +260,9 @@ html, body {
     line-height: 1.55;
 }
 .rec-card-pink {
-    background:#FCE7F3;
-    color:#222222;
-    border: 1px solid #fbb6d3;
+    background: #fbeae4;
+    color: var(--charcoal) !important;
+    border: 1px solid #e9c3b0;
     border-radius: 12px;
     padding: 1rem 1.1rem;
     margin-bottom: .7rem;
@@ -243,18 +272,26 @@ html, body {
 
 /* ── section title ── */
 .section-title {
-    font-size:28px;
+    font-size:26px;
     font-weight:700;
-    color:#4C1D95;
-    border-bottom: 2px solid #ede9fe;
+    color: var(--clay-dark) !important;
+    border-bottom: 2px solid var(--line);
     padding-bottom: .4rem;
     margin-bottom: 1rem;
 }
 
+/* ── sub-headings inside the recommendation columns (fixes invisible text) ── */
+.sub-heading {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--sage-dark) !important;
+    margin: .4rem 0 .6rem;
+}
+
 /* ── chat bubbles ── */
 .chat-user {
-    background: #7c3aed;
-    color: white;
+    background: var(--charcoal);
+    color: white !important;
     border-radius: 18px 18px 4px 18px;
     padding: .75rem 1.1rem;
     margin: .5rem 0 .5rem 20%;
@@ -262,9 +299,9 @@ html, body {
     line-height: 1.5;
 }
 .chat-bot {
-    background: white;
-    color: #1e1b2e;
-    border: 1px solid #e5e7eb;
+    background: var(--card);
+    color: var(--charcoal) !important;
+    border: 1px solid var(--line);
     border-radius: 18px 18px 18px 4px;
     padding: .75rem 1.1rem;
     margin: .5rem 20% .5rem 0;
@@ -272,15 +309,44 @@ html, body {
     line-height: 1.5;
     box-shadow: 0 2px 8px rgba(0,0,0,.05);
 }
-.chat-label { font-size: .78rem; color: #9ca3af; margin-bottom: .15rem; }
+.chat-label { font-size: .78rem; color: var(--sage-dark) !important; margin-bottom: .15rem; font-weight: 600; }
+
+/* ── buttons ── */
+/* جميع الأزرار */
+.stButton > button {
+    background-color: #000000 !important;
+    color: #FFFFFF !important;
+    border: 2px solid #000000 !important;
+    border-radius: 12px !important;
+    font-weight: 600 !important;
+}
+
+/* النص داخل الزر */
+.stButton > button p,
+.stButton > button span,
+.stButton > button div {
+    color: #FFFFFF !important;
+}
+
+/* Hover */
+.stButton > button:hover {
+    background-color: #222222 !important;
+    color: #FFFFFF !important;
+}
+
+.stButton > button:hover p,
+.stButton > button:hover span,
+.stButton > button:hover div {
+    color: #FFFFFF !important;
+}
 </style>
 """, unsafe_allow_html=True)
 
 # ── Hero banner ───────────────────────────────────────────────────────────────
 st.markdown("""
 <div class="hero">
-    <h1>🔬 AI Skin Analyzer</h1>
-    <p>Upload a skin image · Get an instant AI diagnosis · Receive personalized skincare advice</p>
+    <h1>🧴 AI Skin Analyzer</h1>
+    <p>Upload a skin photo · Get an instant AI-powered diagnosis · Receive a personalized skincare routine</p>
 </div>
 """, unsafe_allow_html=True)
 
@@ -533,21 +599,21 @@ if st.session_state.analysis_done:
     r1, r2, r3 = st.columns(3, gap="medium")
 
     with r1:
-        st.markdown("#### 📅 Daily Skincare Routine")
+        st.markdown('<div class="sub-heading">📅 Daily Skincare Routine</div>', unsafe_allow_html=True)
         for step in info["routine"]:
             st.markdown(f'<div class="rec-card">{step}</div>', unsafe_allow_html=True)
 
     with r2:
-        st.markdown("#### ✅ Key Ingredients")
+        st.markdown('<div class="sub-heading">✅ Key Ingredients</div>', unsafe_allow_html=True)
         for ing in info["ingredients"]:
             st.markdown(f'<div class="rec-card-purple">✔ {ing}</div>', unsafe_allow_html=True)
 
-        st.markdown("#### ❌ What to Avoid")
+        st.markdown('<div class="sub-heading">❌ What to Avoid</div>', unsafe_allow_html=True)
         for av in info["avoid"]:
             st.markdown(f'<div class="rec-card-pink">✘ {av}</div>', unsafe_allow_html=True)
 
     with r3:
-        st.markdown("#### 💡 Pro Tips")
+        st.markdown('<div class="sub-heading">💡 Pro Tips</div>', unsafe_allow_html=True)
         for tip in info["tips"]:
             st.markdown(f'<div class="rec-card">{tip}</div>', unsafe_allow_html=True)
 
@@ -623,7 +689,7 @@ if st.session_state.analysis_done:
 # ── Footer ────────────────────────────────────────────────────────────────────
 st.markdown("---")
 st.markdown(
-    "<p style='text-align:center;color:#9ca3af;font-size:.85rem;'>"
+    "<p style='text-align:center;color:#6b7280;font-size:.85rem;'>"
     "AI Skin Analyzer · Powered by VGG16 + Llama 3 · "
     "For educational purposes only — not a substitute for professional dermatological advice."
     "</p>",
