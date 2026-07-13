@@ -111,7 +111,7 @@ from groq import Groq
 # The API key is read from an environment variable — never hardcode it here.
 # Set it before running:  setx GROQ_API_KEY "your-new-key"   (Windows, new terminal after)
 #                          export GROQ_API_KEY="your-new-key" (Mac/Linux)
-client = Groq(api_key="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")
+client = Groq(api_key="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")
 
 def ask_llm(condition, confidence, user_question):
 
