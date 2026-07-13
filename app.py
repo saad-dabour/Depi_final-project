@@ -441,7 +441,7 @@ SKINCARE_INFO = {
             "🍊 Vitamin C in the morning + SPF = powerful brightening combo",
         ],
     },
-    "Large Pores": {
+    "Pores": {
         "icon": "🔵",
         "description": (
             "Large pores are expanded hair follicle openings that become more visible when clogged "
